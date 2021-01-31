@@ -35,11 +35,12 @@ class Application(tk.Frame):
         self.test_sect.grid(row=0, column=0, rowspan=20, columnspan=1, sticky="NSEW")
         self.test_sect.columnconfigure((0,1,2,3,4),weight=1)
         
-        self.test_sect_header = tk.Label(master=self.test_sect, text="Template Title", bg="#FFFFFF",relief="raised", width=14)
+        self.test_sect_header = tk.Label(master=self.test_sect, text="Template Title", bd=2, bg="#FFFFFF",relief="flat", width=14)
         self.test_sect_header.grid(row=1, column=2,pady=100,ipady=40)
         self.test_sect_header.configure(font=("Stencil", 16, "bold"))
 
-        self.header_sect = tk.Frame(master=self.master, relief="raised", bg="#FFFFFF", bd=4)
+        self.header_sect = tk.Frame(master=self.master, relief="flat",bg="#FFFFFF",highlightthickness=2)
+        self.header_sect.configure(highlightbackground="black")
         self.header_sect.rowconfigure((0,1,2),weight=1)
         self.header_sect.columnconfigure((0,1,2),weight=1)
         self.header_sect.grid(row=2, column=12,rowspan=2,sticky="NSEW")
@@ -50,19 +51,12 @@ class Application(tk.Frame):
 
         self.body_sect = tk.Frame(master=self.master, relief="groove",bg="#FFFFFF", bd=4)
         self.body_sect.rowconfigure((0,1,2,3,4), weight=1)
-        self.body_sect.columnconfigure((0,1,2,3,4), weight=1)
-        self.body_sect.grid(row=5, column=6, sticky="NSEW", columnspan=13, rowspan=10)
+        self.body_sect.columnconfigure((0,1,2,3,4,5,6,7,8,9,10), weight=1)
+        self.body_sect.grid(row=5, column=6, sticky="NSEW", columnspan=13, rowspan=11)
 
         self.body_sect_default_label = tk.Label(master=self.body_sect, text="Please select a test to begin.", justify="center")
         self.body_sect_default_label.configure(font=("Times New Roman",20, "bold"),bg="#FFFFFF")
-        self.body_sect_default_label.grid(row=0, column=2, rowspan=2)
-
-        #self.body_sect_start_btn = tk.Button(master=self.body_sect, text="Start",)
-
-        
-        
-        #self.header_sect.grid_propagate(0)
-        #self.header_sect.grid(row=2, column=1, padx=40, columnspan=15)
+        self.body_sect_default_label.grid(row=0, column=5, rowspan=2)
 
     #Function for adding seperate tests to main application
     def add_test(self, test):
@@ -83,13 +77,16 @@ class Application(tk.Frame):
         question = self.questions.get_head_question()
         print(question.get_next_question().get_question())
         self.set_test_header()
-        self.set_test_body()
+        self.body_sect_default_label.destroy()
+        self.create_test_start_btn()
 
     def set_test_header(self):
         self.header_sect_label.config(text=self.selected_test.test_name)
 
-    def set_test_body(self):
-        self.body_sect_default_label.destroy()
+    def create_test_start_btn(self):
+        self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
+        self.start_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
+        self.start_btn.configure(font=("Arial", 21, "bold"))
         
 #class for creating instances of different tests to add to application
 class Test():
