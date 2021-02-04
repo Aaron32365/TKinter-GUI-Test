@@ -31,32 +31,48 @@ class Application(tk.Frame):
     def create_widgets(self):
 
         #Section for holding the created tests
+
+        #creating and placing section to hold a list of tests
         self.test_sect = tk.Frame(master=self.master, relief="groove",bd=2,bg="#AEE8B6")
         self.test_sect.grid(row=0, column=0, rowspan=20, columnspan=1, sticky="NSEW")
         self.test_sect.columnconfigure((0,1,2,3,4),weight=1)
-        
+        #####
+
+        #title for test section
         self.test_sect_header = tk.Label(master=self.test_sect, text="Template Title", bd=2, bg="#FFFFFF",relief="flat", width=14)
         self.test_sect_header.grid(row=1, column=2,pady=100,ipady=40)
         self.test_sect_header.configure(font=("Stencil", 16, "bold"))
+        #####
 
+        #primary header section for showing selected test title
         self.header_sect = tk.Frame(master=self.master, relief="flat",bg="#FFFFFF",highlightthickness=2)
         self.header_sect.configure(highlightbackground="black")
         self.header_sect.rowconfigure((0,1,2),weight=1)
         self.header_sect.columnconfigure((0,1,2),weight=1)
         self.header_sect.grid(row=2, column=12,rowspan=2,sticky="NSEW")
+        #####
         
+        #primary header
         self.header_sect_label = tk.Label(master=self.header_sect, text="No Test Selected", justify="center")
         self.header_sect_label.configure(font=("Arial", 40, "bold"),bg="#FFFFFF",width=20)
         self.header_sect_label.grid(column=1,row=1)
+        #####
 
+        #body section to hold questions in each test
         self.body_sect = tk.Frame(master=self.master, relief="groove",bg="#FFFFFF", bd=4)
         self.body_sect.rowconfigure((0,1,2,3,4), weight=1)
         self.body_sect.columnconfigure((0,1,2,3,4,5,6,7,8,9,10), weight=1)
         self.body_sect.grid(row=5, column=6, sticky="NSEW", columnspan=13, rowspan=11)
+        self.body_sect.grid_propagate(0) #this line makes body_sect stay the same size regardless of text inside of frame.
+        #####
 
+        #default label when a test has not been selected - located in body section
         self.body_sect_default_label = tk.Label(master=self.body_sect, text="Please select a test to begin.", justify="center")
         self.body_sect_default_label.configure(font=("Times New Roman",20, "bold"),bg="#FFFFFF")
         self.body_sect_default_label.grid(row=0, column=5, rowspan=2)
+
+        #label to describe a test when selected - located in body section - replaces default label after test as been selected
+        self.body_sect_description = tk.Label(master=self.body_sect, text="", justify="center")
 
     #Function for adding seperate tests to main application
     def add_test(self, test):
@@ -74,30 +90,43 @@ class Application(tk.Frame):
         self.selected_test = test
         print(test.test_name)
         print(self.selected_test)
-        question = self.questions.get_head_question()
-        print(question.get_next_question().get_question())
         self.set_test_header()
         self.body_sect_default_label.destroy()
-        self.create_test_start_btn()
+        self.setup_test()
 
     def set_test_header(self):
         self.header_sect_label.config(text=self.selected_test.test_name)
 
-    def create_test_start_btn(self):
+    #removes default test label, creates a button to innitiate a selected test, and  shows a selected tests description
+    def setup_test(self):
+        self.body_sect_description.configure(text="")
         self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
         self.start_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
-        self.start_btn.configure(font=("Arial", 21, "bold"))
+        self.start_btn.configure(font=("Arial", 21, "bold"), command=lambda:self.start_test(self.selected_test))
+        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, justify="center")
+        self.body_sect_description.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF")
+        self.body_sect_description.grid(row=0, column=0, rowspan=2, columnspan=11)
+
+    #function for innitiating a selected test - activated 
+    def start_test(self, test):
+        print(test.test_name)
+        self.body_sect_description.config(text="")
+        self.start_btn.destroy()
+        self.next_btn = tk.Button(master=self.body_sect,text="Next",fg="#FFFFFF",bg="#AEE8B6",justify="center")
+        self.next_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
+        self.next_btn.configure(font=("Arial", 21, "bold"))
+        
         
 #class for creating instances of different tests to add to application
 class Test():
-    def __init__(self, parent, questions=None, answers=None, test_name=None):
+    def __init__(self, parent, question_list=None, test_name=None,test_description=None):
         self.parent=parent
-        self.test_name=test_name
+        self.question_list = question_list
+        self.test_name = test_name
+        self.description = test_description
         self.test_btn = tk.Button(master=self.parent.test_sect, bg="#FFFFFF", fg="black",padx=24,#make buttons more visually appealing
                                   pady=14, bd=2, relief='raised',text=self.test_name, height=1, width=8)
         self.test_btn.configure(font=("Roboto", 12, "bold"),command=lambda: self.parent.selection(self))#tell Application which test is being selected
-        self.questions = questions
-        self.answers = answers
         
 #NOTE -- maybe use linked list data structure for maintaining order of questions in a test
 
@@ -149,27 +178,39 @@ package1 = {"question": "How are you today?",
            "choices": {"A": "good", "B": "bad", "C": "Okay"},
            "answer": "A"}
 
-package2 = {"question2": "How are you today?",
+package2 = {"question2": "what are you doing today?",
+           "choices": {"A": "something", "B": "alot", "C": "Nothing"},
+           "answer": "A"}
+
+package3 = {"questionA": "How are you today?",
            "choices": {"A": "good", "B": "bad", "C": "Okay"},
            "answer": "A"}
+
+package4 = {"questionB": "what are you doing today?",
+           "choices": {"A": "something", "B": "alot", "C": "Nothing"},
+           "answer": "A"}
+
+#Initialization function
 def main():
     
     #instance of Application running mainloop
     app = Application(master=root)
+    
     question_1 = Question(package1)
     question_2 = Question(package2)
-    question_list_1 = Questions_List(question_1)
-    question_list_1.insert_begenning(question_2)
+
+    question_3 = Question(package3)
+    question_4 = Question(package4)
     
-    #testing
-    t1q = ["q1","q2"]
-    t1a = ["a1","a2"]
-    test1 = Test(app, t1q, t1a, "Test 1")
-    t2q = ["q3","q4"]
-    t2a = ["a3", "a4"]
-    test2 = Test(app, t2q, t2a, "Test 2")
-    app.questions = question_list_1
-    #testing
+    question_list_1 = Questions_List(question_2)
+    question_list_1.insert_begenning(question_1)
+
+    question_list_2 = Questions_List(question_3)
+    question_list_2.insert_begenning(question_4)
+
+
+    test1 = Test(app, question_list_1, "Fire Behavior", "This test will assess an analysts understanding of fire and fire behavior.")
+    test2 = Test(app, question_list_2, "Not Fire Behavior", "This is a 2nd test description")
     app.add_test(test1)
     app.add_test(test2)
     
