@@ -17,8 +17,6 @@ class Application(tk.Frame):
         self.master.title("FireGuard Test")
         self.master.configure(background="#F5F5F5")
         self.master.attributes("-fullscreen",True)
-        #self.master.rowconfigure((0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,8,19,20),weight=1)
-        #self.master.columnconfigure(0, weight=1)
 
         #create 5 col/6 row grid
         self.master.columnconfigure((0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24), weight=1)
@@ -73,6 +71,8 @@ class Application(tk.Frame):
 
         #label to describe a test when selected - located in body section - replaces default label after test as been selected
         self.body_sect_description = tk.Label(master=self.body_sect, text="", justify="center")
+        #label to describe a question in a given test
+        self.question_label = tk.Label(master=self.body_sect, text="")
 
     #Function for adding seperate tests to main application
     def add_test(self, test):
@@ -99,22 +99,43 @@ class Application(tk.Frame):
 
     #removes default test label, creates a button to innitiate a selected test, and  shows a selected tests description
     def setup_test(self):
+        self.question_label.configure(text="")
         self.body_sect_description.configure(text="")
         self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
         self.start_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
-        self.start_btn.configure(font=("Arial", 21, "bold"), command=lambda:self.start_test(self.selected_test))
-        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, justify="center")
+        self.start_btn.configure(font=("Arial", 21, "bold"), command=lambda:self.prepare_test(self.selected_test))
+        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, justify="center", wraplength=950)
         self.body_sect_description.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF")
         self.body_sect_description.grid(row=0, column=0, rowspan=2, columnspan=11)
 
     #function for innitiating a selected test - activated 
-    def start_test(self, test):
+    def prepare_test(self, test):
         print(test.test_name)
         self.body_sect_description.config(text="")
         self.start_btn.destroy()
         self.next_btn = tk.Button(master=self.body_sect,text="Next",fg="#FFFFFF",bg="#AEE8B6",justify="center")
         self.next_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
         self.next_btn.configure(font=("Arial", 21, "bold"))
+        self.start_test()
+
+    def start_test(self):
+        points = 0
+        question_counter = 1
+        #current_choice = tk.IntVar()
+        #current_answer = tk.IntVar()
+        current_question_package = self.selected_test.question_list.get_head_question()
+        print(self.selected_test.question_list.get_head_question().get_question())
+        self.question_label.grid(row=0, column=0, rowspan=2, columnspan=11)
+        self.question_label.configure(font=("Courier New",14, "bold"),bg="#FFFFFF")
+
+
+        #while current_question_package:
+        self.question_label.config(text="{}. {}".format(question_counter,current_question_package.get_question()["question"]))
+        next_question = current_question_package.get_next_question()
+        current_choice = current_question_package.get_question()["answer"]
+        
+        
+            
         
         
 #class for creating instances of different tests to add to application
@@ -172,13 +193,16 @@ class Question():
 
     def get_question(self):
         return self.package
+    
+    #possibly put radiobuttons inside of question class
+    
 # Main functin for initializing the application and executing primary statements
 
-package1 = {"question": "How are you today?",
-           "choices": {"A": "good", "B": "bad", "C": "Okay"},
+package1 = {"question": "In what direction does fire generally move when at the bottom of a hill?",
+           "choices": {"A": "North", "B": "Uphill", "C": "Downhill"},
            "answer": "A"}
 
-package2 = {"question2": "what are you doing today?",
+package2 = {"question": "what are you doing today?",
            "choices": {"A": "something", "B": "alot", "C": "Nothing"},
            "answer": "A"}
 
@@ -186,7 +210,7 @@ package3 = {"questionA": "How are you today?",
            "choices": {"A": "good", "B": "bad", "C": "Okay"},
            "answer": "A"}
 
-package4 = {"questionB": "what are you doing today?",
+package4 = {"question": "what are you doing today?",
            "choices": {"A": "something", "B": "alot", "C": "Nothing"},
            "answer": "A"}
 
