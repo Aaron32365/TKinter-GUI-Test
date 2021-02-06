@@ -58,21 +58,27 @@ class Application(tk.Frame):
 
         #body section to hold questions in each test
         self.body_sect = tk.Frame(master=self.master, relief="groove",bg="#FFFFFF", bd=4)
-        self.body_sect.rowconfigure((0,1,2,3,4), weight=1)
+        self.body_sect.rowconfigure((0,1,2,3,4,5,6,7,8,9,10,11,12,13,14), weight=1)
         self.body_sect.columnconfigure((0,1,2,3,4,5,6,7,8,9,10), weight=1)
         self.body_sect.grid(row=5, column=6, sticky="NSEW", columnspan=13, rowspan=11)
         self.body_sect.grid_propagate(0) #this line makes body_sect stay the same size regardless of text inside of frame.
         #####
 
         #default label when a test has not been selected - located in body section
-        self.body_sect_default_label = tk.Label(master=self.body_sect, text="Please select a test to begin.", justify="center")
+        self.body_sect_default_label = tk.Label(master=self.body_sect, text="Please select a test to begin.", justify="center",wraplength=900)
         self.body_sect_default_label.configure(font=("Times New Roman",20, "bold"),bg="#FFFFFF")
-        self.body_sect_default_label.grid(row=0, column=5, rowspan=2)
+        self.body_sect_default_label.grid(row=1, column=5, rowspan=2)
 
         #label to describe a test when selected - located in body section - replaces default label after test as been selected
         self.body_sect_description = tk.Label(master=self.body_sect, text="", justify="center")
         #label to describe a question in a given test
         self.question_label = tk.Label(master=self.body_sect, text="")
+
+        #radiobuttons for selecting answers and representing questions, created but not placed on grid until start_test func
+        self.r1 = tk.Radiobutton(master=self.body_sect, text="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+        self.r2 = tk.Radiobutton(master=self.body_sect, text="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", justify="left")
+        self.r3 = tk.Radiobutton(master=self.body_sect, text="eeeeee")
+        self.r4 = tk.Radiobutton(master=self.body_sect, text="eeeeee")
 
     #Function for adding seperate tests to main application
     def add_test(self, test):
@@ -87,6 +93,13 @@ class Application(tk.Frame):
 
     #Function for choosing the test to take
     def selection(self,test):
+        #hide any radiobutton choices if they've been gridded
+        self.r1.grid_remove()
+        self.r2.grid_remove()
+        self.r3.grid_remove()
+        self.r4.grid_remove()
+        #self.
+        
         self.selected_test = test
         print(test.test_name)
         print(self.selected_test)
@@ -102,40 +115,44 @@ class Application(tk.Frame):
         self.question_label.configure(text="")
         self.body_sect_description.configure(text="")
         self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
-        self.start_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
+        self.start_btn.grid(row=13, column=10, ipadx=30, pady=2, ipady=6, padx=12)
         self.start_btn.configure(font=("Arial", 21, "bold"), command=lambda:self.prepare_test(self.selected_test))
-        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, justify="center", wraplength=950)
+        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, wraplength=950, anchor="w")
         self.body_sect_description.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF")
-        self.body_sect_description.grid(row=0, column=0, rowspan=2, columnspan=11)
+        self.body_sect_description.grid(row=2, column=2, rowspan=2)
 
     #function for innitiating a selected test - activated 
     def prepare_test(self, test):
         print(test.test_name)
-        self.body_sect_description.config(text="")
+        self.body_sect_description.grid_remove()
         self.start_btn.destroy()
         self.next_btn = tk.Button(master=self.body_sect,text="Next",fg="#FFFFFF",bg="#AEE8B6",justify="center")
-        self.next_btn.grid(row=4, column=10, ipadx=30, ipady=6, padx=12)
+        self.next_btn.grid(row=13, column=10, ipadx=30,pady=2, ipady=6, padx=12)
         self.next_btn.configure(font=("Arial", 21, "bold"))
         self.start_test()
 
     def start_test(self):
+        #grid the radiobuttons for selecting a questions answer and plotting choices
+        self.r1.grid(row=4, column=2)
+        self.r2.grid(row=5, column=2)
+        self.r3.grid(row=6, column=2)
+        self.r4.grid(row=7, column=2)
+        
         points = 0
         question_counter = 1
         #current_choice = tk.IntVar()
         #current_answer = tk.IntVar()
         current_question_package = self.selected_test.question_list.get_head_question()
         print(self.selected_test.question_list.get_head_question().get_question())
-        self.question_label.grid(row=0, column=0, rowspan=2, columnspan=11)
+        self.question_label.grid(row=2, column=0, rowspan=2, columnspan=11)
         self.question_label.configure(font=("Courier New",14, "bold"),bg="#FFFFFF")
 
 
         #while current_question_package:
-        self.question_label.config(text="{}. {}".format(question_counter,current_question_package.get_question()["question"]))
+        self.question_label.config(text="{}. {}".format(question_counter,current_question_package.get_question()["question"]), justify="left")
         next_question = current_question_package.get_next_question()
         current_choice = current_question_package.get_question()["answer"]
         
-        
-            
         
         
 #class for creating instances of different tests to add to application
@@ -183,7 +200,7 @@ class Question():
     def __init__(self, package, next_question=None):
         self.package = package
         self.next_question = next_question
-        pass
+        
 
     def set_next_question(self, next_question):
         self.next_question = next_question
