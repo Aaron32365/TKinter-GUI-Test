@@ -70,15 +70,21 @@ class Application(tk.Frame):
         self.body_sect_default_label.grid(row=1, column=5, rowspan=2)
 
         #label to describe a test when selected - located in body section - replaces default label after test as been selected
-        self.body_sect_description = tk.Label(master=self.body_sect, text="", justify="center")
+        self.body_sect_description = tk.Label(master=self.body_sect, text="")
         #label to describe a question in a given test
-        self.question_label = tk.Label(master=self.body_sect, text="")
+        self.question_label = tk.Label(master=self.body_sect, text="", anchor="w")
+
+        #create button for user to go to next question - gridded later.
+        self.next_btn = tk.Button(master=self.body_sect,text="Next",fg="#FFFFFF",bg="#AEE8B6")
+
+        #create start button for user to start a selected test - gridded later
+        self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
 
         #radiobuttons for selecting answers and representing questions, created but not placed on grid until start_test func
-        self.r1 = tk.Radiobutton(master=self.body_sect, text="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-        self.r2 = tk.Radiobutton(master=self.body_sect, text="eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", justify="left")
-        self.r3 = tk.Radiobutton(master=self.body_sect, text="eeeeee")
-        self.r4 = tk.Radiobutton(master=self.body_sect, text="eeeeee")
+        self.r1 = tk.Radiobutton(master=self.body_sect, text="Fire generally moves uphill when at the base of a hill", anchor="w", bg="#FFFFFF",font=("Times New Roman",12, "bold"),wraplength=800)
+        self.r2 = tk.Radiobutton(master=self.body_sect, text="The direction of the wind", anchor="w", bg="#FFFFFF",font=("Times New Roman",12, "bold"),wraplength=800)
+        self.r3 = tk.Radiobutton(master=self.body_sect, text="downhill", anchor="w", bg="#FFFFFF",font=("Times New Roman",12, "bold"),wraplength=800)
+        self.r4 = tk.Radiobutton(master=self.body_sect, text="North", anchor="w", bg="#FFFFFF",font=("Times New Roman",12, "bold"),wraplength=800)
 
     #Function for adding seperate tests to main application
     def add_test(self, test):
@@ -98,8 +104,11 @@ class Application(tk.Frame):
         self.r2.grid_remove()
         self.r3.grid_remove()
         self.r4.grid_remove()
-        #self.
-        
+        if((self.selected_test != test) and (self.selected_test != None)):
+            self.selected_test.test_btn.config(state="active")
+        self.body_sect_description.grid_remove()
+        self.next_btn.grid_remove()
+        test.test_btn.config(state="disabled")
         self.selected_test = test
         print(test.test_name)
         print(self.selected_test)
@@ -114,44 +123,48 @@ class Application(tk.Frame):
     def setup_test(self):
         self.question_label.configure(text="")
         self.body_sect_description.configure(text="")
-        self.start_btn = tk.Button(master=self.body_sect,text="Start",fg="#FFFFFF",bg="#AEE8B6",justify="center")
         self.start_btn.grid(row=13, column=10, ipadx=30, pady=2, ipady=6, padx=12)
         self.start_btn.configure(font=("Arial", 21, "bold"), command=lambda:self.prepare_test(self.selected_test))
-        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, wraplength=950, anchor="w")
-        self.body_sect_description.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF")
-        self.body_sect_description.grid(row=2, column=2, rowspan=2)
+        self.body_sect_description = tk.Label(master=self.body_sect, text=self.selected_test.description, anchor="center")
+        self.body_sect_description.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF", wraplength=900)
+        self.body_sect_description.grid(row=2, column=0, rowspan=1, columnspan=11)
 
     #function for innitiating a selected test - activated 
     def prepare_test(self, test):
         print(test.test_name)
         self.body_sect_description.grid_remove()
-        self.start_btn.destroy()
-        self.next_btn = tk.Button(master=self.body_sect,text="Next",fg="#FFFFFF",bg="#AEE8B6",justify="center")
-        self.next_btn.grid(row=13, column=10, ipadx=30,pady=2, ipady=6, padx=12)
+        self.start_btn.grid_remove()
+        self.next_btn.grid(row=13, column=9, ipadx=30,pady=2, ipady=6, padx=12)
         self.next_btn.configure(font=("Arial", 21, "bold"))
         self.start_test()
 
     def start_test(self):
         #grid the radiobuttons for selecting a questions answer and plotting choices
-        self.r1.grid(row=4, column=2)
-        self.r2.grid(row=5, column=2)
-        self.r3.grid(row=6, column=2)
-        self.r4.grid(row=7, column=2)
-        
+        self.r1.grid(row=4, column=3, columnspan=5, sticky="W")
+        self.r2.grid(row=5, column=3, columnspan=5, sticky="W")
+        self.r3.grid(row=6, column=3, columnspan=5, sticky="W")
+        self.r4.grid(row=7, column=3, columnspan=5, sticky="W")
+
         points = 0
         question_counter = 1
         #current_choice = tk.IntVar()
         #current_answer = tk.IntVar()
         current_question_package = self.selected_test.question_list.get_head_question()
         print(self.selected_test.question_list.get_head_question().get_question())
-        self.question_label.grid(row=2, column=0, rowspan=2, columnspan=11)
-        self.question_label.configure(font=("Courier New",14, "bold"),bg="#FFFFFF")
+        self.question_label.grid(row=2, column=3, columnspan=7, sticky="w")
+        self.question_label.configure(font=("Times New Roman",18, "bold"),bg="#FFFFFF", anchor="w", wraplength=850)
 
-
+        
+        self.r1.configure(text = current_question_package.get_question()["choices"]["A"])
+        self.r2.configure(text = current_question_package.get_question()["choices"]["B"])
+        self.r3.configure(text = current_question_package.get_question()["choices"]["C"])
+        self.r4.configure(text = current_question_package.get_question()["choices"]["D"])
+        
+        
         #while current_question_package:
-        self.question_label.config(text="{}. {}".format(question_counter,current_question_package.get_question()["question"]), justify="left")
+        self.question_label.config(text="{}. {}".format(question_counter,current_question_package.get_question()["question"]))
         next_question = current_question_package.get_next_question()
-        current_choice = current_question_package.get_question()["answer"]
+        current_answer = current_question_package.get_question()["answer"]
         
         
         
@@ -216,19 +229,19 @@ class Question():
 # Main functin for initializing the application and executing primary statements
 
 package1 = {"question": "In what direction does fire generally move when at the bottom of a hill?",
-           "choices": {"A": "North", "B": "Uphill", "C": "Downhill"},
+           "choices": {"A": "North", "B": "Uphill", "C": "Downhill", "D": "In the direction of the wind"},
            "answer": "A"}
 
 package2 = {"question": "what are you doing today?",
-           "choices": {"A": "something", "B": "alot", "C": "Nothing"},
+           "choices": {"A": "something", "B": "alot", "C": "Nothing", "D": "In the direction of the wind"},
            "answer": "A"}
 
-package3 = {"questionA": "How are you today?",
-           "choices": {"A": "good", "B": "bad", "C": "Okay"},
+package3 = {"questionA": "In what direction does fire generally move when at the bottom of a hill?",
+           "choices": {"A": "good", "B": "bad", "C": "Okay", "D": "In the direction of the wind"},
            "answer": "A"}
 
-package4 = {"question": "what are you doing today?",
-           "choices": {"A": "something", "B": "alot", "C": "Nothing"},
+package4 = {"question": "In what direction does fire generally move when at the bottom of a hill?",
+           "choices": {"A": "something", "B": "alot", "C": "Nothing", "D": "In the direction of the wind"},
            "answer": "A"}
 
 #Initialization function
@@ -251,7 +264,7 @@ def main():
 
 
     test1 = Test(app, question_list_1, "Fire Behavior", "This test will assess an analysts understanding of fire and fire behavior.")
-    test2 = Test(app, question_list_2, "Not Fire Behavior", "This is a 2nd test description")
+    test2 = Test(app, question_list_2, "Not Fire Behavior", "This test will assess an analysts understanding of fire and fire behavior.")
     app.add_test(test1)
     app.add_test(test2)
     
